@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>取消成功</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif; 
+            background: rgba(0,0,0,0.5); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+        }
+        .modal {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 450px;
+            animation: slideIn 0.4s ease;
+        }
+        @keyframes slideIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .cancel-icon {
+            font-size: 70px;
+            color: #ff9800;
+            margin-bottom: 20px;
+            animation: shake 0.5s ease;
+        }
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+        h2 {
+            color: #ff9800;
+            margin-bottom: 20px;
+            font-size: 26px;
+        }
+        .info {
+            background: #fff3e0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: #555;
+            border-left: 4px solid #ff9800;
+            text-align: left;
+        }
+        .info p {
+            margin: 8px 0;
+            font-size: 15px;
+        }
+        .info strong {
+            color: #ff9800;
+            min-width: 70px;
+            display: inline-block;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            margin-top: 30px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="modal">
+        <div class="cancel-icon">✅</div>
+        <h2>已成功取消预约</h2>
+        <div class="info">
+            <p><strong>🏠 房源：</strong>{{ house_title }}</p>
+            <p><strong>📅 日期：</strong>{{ date }}</p>
+            <p><strong>⏰ 时间：</strong>{{ time }}</p>
+        </div>
+
+        <!--👇 根据来源决定返回地址 -->
+        {% if source == 'dashboard' %}
+            <a href="/dashboard" class="btn">好的</a>
+        {% else %}
+            <a href="/booking" class="btn">好的</a>
+        {% endif %}
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>预约成功</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .modal {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 450px;
+            animation: slideIn 0.4s ease;
+        }
+        @keyframes slideIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .success-icon {
+            font-size: 70px;
+            margin-bottom: 20px;
+            animation: bounce 0.6s ease;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        h2 {
+            color: #4CAF50;
+            margin-bottom: 25px;
+            font-size: 26px;
+        }
+        .info {
+            background: #f0f7f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+            border-left: 4px solid #4CAF50;
+        }
+        .info p {
+            margin: 10px 0;
+            color: #333;
+            font-size: 15px;
+        }
+        .info strong {
+            color: #4CAF50;
+            min-width: 80px;
+            display: inline-block;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            transition: all 0.3s;
+            background: #4CAF50;
+            color: white;
+            margin-top: 30px;
+        }
+        .btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="modal">
+        <div class="success-icon">✅</div>
+        <h2>预约成功！</h2>
+        <div class="info">
+            <p><strong>🏠 房源：</strong>{{ house_title }}</p>
+            <p><strong>📅 日期：</strong>{{ date }}</p>
+            <p><strong>⏰ 时间：</strong>{{ time }}</p>
+        </div>
+        <!-- 👇 只保留一个"好的"按钮 -->
+        <a href="/dashboard" class="btn">好的</a>
+    </div>
+</body>
+</html>
+
+

@@ -1,0 +1,561 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天 - 租房助手</title>
+    <style>
+        /*========== 基础样式 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ========== 主容器 ========== */
+        .chat-container {
+            display: flex;
+            height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);}
+
+        /* ========== 左侧联系人列表 ========== */
+        .sidebar {
+            width: 320px;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .sidebar-header {
+            padding: 20px 15px;  /* 上下20px，左右15px */
+            background: #ff6b35;
+            color: white;
+            text-align: center;  /* 标题居中 */
+}
+
+        .contacts-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .contact-item:hover {
+            background: #f9f9f9;
+        }
+
+        .contact-item.active {
+            background: #fff3e0;
+            border-left: 3px solid #ff6b35;
+        }
+
+        .contact-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #ff6b35;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .contact-info {
+            flex: 1;min-width: 0;
+        }
+
+        .contact-name {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 4px;
+            color: #333;
+        }
+
+        .contact-last-msg {
+            font-size: 13px;
+            color: #999;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .contact-time {
+            font-size: 12px;
+            color: #999;
+            flex-shrink: 0;
+        }
+
+        /* ========== 右侧聊天窗口 ========== */
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8f8f8;
+        }
+
+        /*👇 升级：聊天窗口顶部（增加房源信息和预约按钮） */
+        .chat-header {
+            padding: 15px 20px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;  /* 左右分布 */
+        }
+
+        /*左侧：联系人信息 */
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .chat-header .contact-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+            margin-right: 12px;
+        }
+
+        .header-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-contact-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        /*👇 新增：房源信息显示 */
+        .header-house-info {
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .house-info-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .house-info-item i {
+            color: #ff6b35;}
+
+        /* 右侧：预约按钮 */
+        .booking-btn {
+            padding: 10px 20px;
+            background: #ff6b35;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;text-decoration: none;
+            display: inline-block;
+        }
+
+        .booking-btn:hover {
+            background: #ff5722;  /* 悬停时颜色变深 */
+            transform: translateY(-2px);/* 悬停时轻微上浮 */
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);  /* 添加阴影 */
+        }
+
+        .booking-btn:active {
+            transform: translateY(0);  /* 点击时恢复 */
+        }
+
+        /* ========== 消息显示区 ========== */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 单条消息 */
+        .message {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            max-width: 70%;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.received {
+            align-self: flex-start;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        /*👇 新增：消息内容容器（包含标签和气泡） */
+        .message-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* 对方发的消息，标签在左边 */
+        .message.received .message-content {
+            align-items: flex-start;
+        }
+
+        /* 我发的消息，标签在右边 */
+        .message.sent .message-content {
+            align-items: flex-end;
+        }
+
+        /*👇 新增：自动回复标签 */
+        .auto-reply-badge {
+            font-size: 11px;
+            color: #999;
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        /* 消息气泡 */
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message.received .message-bubble {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.sent .message-bubble {
+            background: #ff6b35;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #ddd;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .message.received .message-avatar {
+            background: #ff6b35;
+        }
+
+        .message.sent .message-avatar {
+            background: #4CAF50;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        /* ========== 输入区域 ========== */
+        .input-area {
+            padding: 15px 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        #messageInput:focus {
+            border-color: #ff6b35;
+        }
+
+        #sendBtn {
+            padding: 12px 30px;
+            background: #ff6b35;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        #sendBtn:hover {
+            background: #ff5722;
+        }
+
+        #sendBtn:active {
+            transform: scale(0.98);
+        }
+
+        /* ========== 空状态 ========== */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+        }
+
+        /* ========== 滚动条美化 ========== */
+        .contacts-list::-webkit-scrollbar,
+        .messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .contacts-list::-webkit-scrollbar-thumb,
+        .messages-container::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+
+        .contacts-list::-webkit-scrollbar-thumb:hover,
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+
+        <!-- ========== 左侧：联系人列表 ========== -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2 style="font-size: 20px;">💬 消息中心</h2>
+            </div>
+
+            <div class="contacts-list">
+                {% if contacts %}
+                    {% for contact in contacts %}
+                    <a href="/chat/{{ contact.id }}"
+                       class="contact-item {% if current_contact and current_contact.id == contact.id %}active{% endif %}">
+                        <div class="contact-avatar">{{ contact.avatar }}</div>
+                        <div class="contact-info">
+                            <div class="contact-name">{{ contact.name }}</div>
+                            <div class="contact-last-msg">{{ contact.last_message or '暂无消息' }}</div></div>
+                        <div class="contact-time">
+                            {{ contact.last_message_time.strftime('%H:%M') if contact.last_message_time else '' }}
+                        </div>
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    <div style="padding: 30px; text-align: center; color: #999;">
+                        <p>📭暂无联系人</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========== 右侧：聊天窗口 ========== -->
+        <div class="chat-main">
+            {% if current_contact %}
+                <!-- 👇 升级：聊天窗口顶部（增加房源信息和预约按钮） -->
+                <div class="chat-header">
+                    <div class="header-left">
+                        <div class="contact-avatar">{{ current_contact.avatar }}</div>
+                        <div class="header-info">
+                            <div class="header-contact-name">{{ current_contact.name }}</div>
+                            <!-- 房源信息 -->
+                            <div class="header-house-info">
+                                <div class="house-info-item">
+                                    <span>🏠</span>
+                                    <span>{{ current_contact.house_title }}</span>
+                                </div>
+                                <div class="house-info-item">
+                                    <span>💰</span>
+                                    <span>{{ current_contact.house_price }}</span>
+                                </div>
+                                <div class="house-info-item">
+                                    <span>📐</span>
+                                    <span>{{ current_contact.house_area }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 预约看房按钮 -->
+                <a href="/booking" class="booking-btn">📅 预约看房</a>
+                </div>
+
+                <!-- 消息显示区 -->
+                <div class="messages-container" id="messagesContainer">
+                    {% for msg in messages %}
+                    <div class="message {% if msg.sender_id == 1 %}sent{% else %}received{% endif %}">
+                        <div class="message-avatar">
+                            {% if msg.sender_id == 1 %}
+                👤
+                            {% else %}
+                                {{ current_contact.avatar }}
+                            {% endif %}
+                        </div>
+                        <div class="message-content">
+                            <!--👇 如果是自动回复，显示标签 -->
+                            {% if msg.is_auto_reply %}
+                <span class="auto-reply-badge">🤖 自动回复</span>
+                            {% endif %}
+
+                            <div class="message-bubble">{{ msg.content }}</div>
+                <div class="message-time">{{ msg.timestamp }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- 输入框 -->
+                <div class="input-area">
+                    <input type="text"
+                           id="messageInput"
+                           placeholder="输入消息...试试发送'租金'、'位置'、'看房'等关键词"
+                           onkeypress="if(event.key==='Enter') sendMessage()">
+                    <button id="sendBtn" onclick="sendMessage()">发送</button>
+                </div>{% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">💬</div>
+                    <div class="empty-state-text">请从左侧选择一个联系人开始聊天</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!--========== JavaScript========== -->
+    <script>
+        const currentContactId = {{ current_contact.id if current_contact else 'null' }};
+
+        // 发送消息函数
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+
+            if (!content || !currentContactId) {
+                return;
+            }
+
+            const data = {
+                sender_id: 1,
+                recipient_id: currentContactId,
+                content: content,
+                is_auto_reply: false
+            };
+
+            // 显示发送中状态
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            sendBtn.textContent = '发送中...';
+
+            fetch('/api/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    input.value = '';
+
+                    // 👇 如果有自动回复，等待一下再刷新页面（让用户看到"发送中"的效果）
+                    if (result.auto_reply) {
+                        setTimeout(() => {
+                            location.reload();
+                        }, 500);
+                    } else {
+                        location.reload();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('发送失败:', error);
+                alert('发送失败，请重试');
+                sendBtn.disabled = false;
+                sendBtn.textContent = '发送';
+            });
+        }
+
+        // 页面加载后滚动到底部
+        window.onload = function() {
+            const container = document.getElementById('messagesContainer');
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        };
+    </script>
+</body>
+</html>
+
